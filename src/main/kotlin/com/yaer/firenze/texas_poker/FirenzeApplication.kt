@@ -1,4 +1,4 @@
-package com.yaer.firenze
+package com.yaer.firenze.texas_poker
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
