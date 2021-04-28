@@ -1,8 +1,18 @@
 package com.yaer.firenze.texas_poker
 
 enum class Cards {
-    Dimand_1,
-    Dimand_2,
-    Dimand_3,
-    Dimand_J,
+    DIAMOND_1,
+    DIAMOND_2,
+    DIAMOND_3,
+    DIAMOND_4,
+    DIAMOND_5,
+    DIAMOND_6,
+    DIAMOND_7,
+    DIAMOND_8,
+    DIAMOND_9,
+    DIAMOND_10,
+    DIAMOND_J,
+    DIAMOND_Q,
+    DIAMOND_K,
+    DIAMOND_A,
 }

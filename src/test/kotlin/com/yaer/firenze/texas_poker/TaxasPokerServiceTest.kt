@@ -6,12 +6,10 @@ import jdk.nashorn.internal.ir.annotations.Ignore
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.kotlin.*
+import org.mockito.kotlin.ignoreStubs
 
 internal class TaxasPokerServiceTest {
-    private val pokerRepository: PokerRepository = mock()
-    private val pokerService = TaxasPokerService(pokerRepository)
+    private val pokerService = TaxasPokerService()
 
     @Test
     internal fun rule_there_are_at_lease_two_player_to_start_the_game() {
@@ -27,13 +25,8 @@ internal class TaxasPokerServiceTest {
         val player2 = Player("Two", null)
         val players = listOf(player1, player2)
         val initGameRequest = InitGameRequest(players)
-        whenever(pokerRepository.retrieveCardsByName(any())).thenReturn(listOf(Cards.Dimand_1, Cards.Dimand_J))
-        whenever(pokerRepository.retrieveCurrentRound()).thenReturn(Round(players))
 
         pokerService.initGame(initGameRequest)
-
-        verify(pokerRepository, times(1)).save(eq(player1), anyList())
-        verify(pokerRepository, times(1)).save(eq(player2), anyList())
 
         val playerOneCards = pokerService.retrievePlayerCards("One")
         val playerTwoCards = pokerService.retrievePlayerCards("Two")
@@ -47,13 +40,10 @@ internal class TaxasPokerServiceTest {
         val player2 = Player("Two", null)
         val players = listOf(player1, player2)
         val initGameRequest = InitGameRequest(players)
-        whenever(pokerRepository.retrieveCurrentRound()).thenReturn(Round(players))
 
         pokerService.initGame(initGameRequest)
 
-        verify(pokerRepository, timeout(1)).initRound(players)
         val currentRound = pokerService.retrieveCurrentRoundStatus()
-        verify(pokerRepository, timeout(1)).retrieveCurrentRound()
         assertThat(currentRound.roundName).isEqualTo(RoundName.PRE_FLOP)
         assertThat(currentRound.actionTakingPlayer).isEqualTo(player1)
         assertThat(currentRound.actionRequiredPlayers).containsOnly(player2)
@@ -75,13 +65,26 @@ internal class TaxasPokerServiceTest {
     }
 
     @Test
-    @Ignore
     internal fun rule_bigBlind_bet_two_times_larger_then_smallBlind() {
+        val player1 = Player("One", Role.SMALL_BLIND)
+        val player2 = Player("Two", Role.BIG_BLIND)
+        val player3 = Player("Three", null)
+        val players = listOf(player1, player2, player3)
+        val initGameRequest = InitGameRequest(players)
+        pokerService.initGame(initGameRequest)
+        val currentRound = Round(players)
+        currentRound.actionCompletedPlayer = player1
+        currentRound.actionTakingPlayer = player2
+        currentRound.performableActions = listOf(Action.RAISE)
+        currentRound.actionRequiredPlayers = listOf(player3)
+        pokerService.roundDetails = currentRound
+
         val actionRequest = ActionRequest(Action.BET, 2)
         val round = pokerService.takeAction(actionRequest)
 
         assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
         assertThat(round.actionCompletedPlayer?.role).isEqualTo(Role.BIG_BLIND)
+        assertThat(round.actionCompletedPlayer).isEqualTo(player2)
         val pot = pokerService.retrievePotStatus()
         assertThat(pot.chips).isEqualTo(4)
     }

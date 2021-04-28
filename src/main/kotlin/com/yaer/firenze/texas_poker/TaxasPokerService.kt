@@ -4,16 +4,28 @@ import com.yaer.firenze.texas_poker.request.ActionRequest
 import com.yaer.firenze.texas_poker.request.InitGameRequest
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.collections.HashMap
 
 @Service
-class TaxasPokerService(private val pokerRepository: PokerRepository) {
-    private lateinit var pot: Pot
-    private lateinit var leftCards: Stack<Cards>
+class TaxasPokerService {
+    lateinit var pot: Pot
+    lateinit var leftCards: Stack<Cards>
+    lateinit var roundDetails: Round
+    lateinit var playerCardsMap: HashMap<Player, List<Cards>>
+    lateinit var playerInfo: HashMap<String, Player>
 
 
-    fun takeAction(action: ActionRequest): Round {
-        TODO("Not yet implemented")
+    fun takeAction(actionRequest: ActionRequest): Round {
+        val previousRound = roundDetails.copy()
+        roundDetails.actionRequiredPlayers = listOf(previousRound.actionCompletedPlayer!!)
+        roundDetails.actionTakingPlayer = previousRound.actionRequiredPlayers[0]
+        roundDetails.actionCompletedPlayer = previousRound.actionTakingPlayer
+        if (actionRequest.action == Action.BET) {
+            pot.chips += actionRequest.chips
+        }
+        return roundDetails
     }
+
 
     fun retrievePotStatus(): Pot {
         return pot
@@ -28,14 +40,17 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
         }
         initGameCards()
         pot = Pot()
-        pokerRepository.initRound(players)
+        roundDetails = Round(players)
+        playerCardsMap = HashMap()
+        playerInfo = HashMap()
         saveAllPlayers(players)
     }
 
     private fun saveAllPlayers(players: List<Player>) {
         players.forEach {
             val defaultCards = generateBasic2Cards()
-            pokerRepository.save(it, defaultCards)
+            playerCardsMap[it] = defaultCards
+            playerInfo[it.name] = it
         }
     }
 
@@ -52,10 +67,11 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
     }
 
     fun retrievePlayerCards(playerName: String): List<Cards> {
-        return pokerRepository.retrieveCardsByName(playerName)
+        val player = playerInfo[playerName]
+        return playerCardsMap[player]!!
     }
 
     fun retrieveCurrentRoundStatus(): Round {
-        return pokerRepository.retrieveCurrentRound()
+        return roundDetails
     }
 }
