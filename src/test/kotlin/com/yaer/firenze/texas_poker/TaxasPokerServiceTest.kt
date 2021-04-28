@@ -2,11 +2,9 @@ package com.yaer.firenze.texas_poker
 
 import com.yaer.firenze.texas_poker.request.ActionRequest
 import com.yaer.firenze.texas_poker.request.InitGameRequest
-import jdk.nashorn.internal.ir.annotations.Ignore
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.ignoreStubs
 
 internal class TaxasPokerServiceTest {
     private val pokerService = TaxasPokerService()
@@ -78,14 +76,13 @@ internal class TaxasPokerServiceTest {
         currentRound.performableActions = listOf(Action.RAISE)
         currentRound.actionRequiredPlayers = listOf(player3)
         pokerService.roundDetails = currentRound
+        pokerService.pot.chips = 2
 
-        val actionRequest = ActionRequest(Action.BET, 2)
+        val actionRequest = ActionRequest(Action.BET, null)
         val round = pokerService.takeAction(actionRequest)
 
         assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
-        assertThat(round.actionCompletedPlayer?.role).isEqualTo(Role.BIG_BLIND)
-        assertThat(round.actionCompletedPlayer).isEqualTo(player2)
         val pot = pokerService.retrievePotStatus()
-        assertThat(pot.chips).isEqualTo(4)
+        assertThat(pot.chips).isEqualTo(6)
     }
 }

@@ -16,13 +16,10 @@ class TaxasPokerService {
 
 
     fun takeAction(actionRequest: ActionRequest): Round {
-        val previousRound = roundDetails.copy()
-        roundDetails.actionRequiredPlayers = listOf(previousRound.actionCompletedPlayer!!)
-        roundDetails.actionTakingPlayer = previousRound.actionRequiredPlayers[0]
-        roundDetails.actionCompletedPlayer = previousRound.actionTakingPlayer
-        if (actionRequest.action == Action.BET) {
-            pot.chips += actionRequest.chips
+        if (roundDetails.actionTakingPlayer.role == Role.BIG_BLIND && roundDetails.roundName == RoundName.PRE_FLOP) {
+            pot.chips += pot.chips * 2
         }
+
         return roundDetails
     }
 

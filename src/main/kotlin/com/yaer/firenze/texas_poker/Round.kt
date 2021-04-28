@@ -2,7 +2,7 @@ package com.yaer.firenze.texas_poker
 
 import com.yaer.firenze.texas_poker.Action.BET
 
-data class Round(val sortedPlayers: List<Player>) {
+class Round(val sortedPlayers: List<Player>) {
     var roundName = RoundName.PRE_FLOP
     var actionTakingPlayer: Player = sortedPlayers[0]
     var actionRequiredPlayers: List<Player> = sortedPlayers.subList(1, sortedPlayers.size)
