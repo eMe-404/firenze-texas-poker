@@ -8,7 +8,7 @@ import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.*
 
 internal class TaxasPokerServiceTest {
-    private val  pokerRepository: PokerRepository = mock()
+    private val pokerRepository: PokerRepository = mock()
     private val pokerService = TaxasPokerService(pokerRepository)
 
     @Test
@@ -37,21 +37,25 @@ internal class TaxasPokerServiceTest {
         assertThat(playerOneCards.size).isEqualTo(2)
         assertThat(playerTwoCards.size).isEqualTo(2)
 
+        val currentRound = pokerService.retrieveCurrentRoundStatus()
+        assertThat(currentRound.roundName).isEqualTo(RoundName.PRE_FLOP)
+        assertThat(currentRound.actionTakingPlayer).isEqualTo(player1)
+        assertThat(currentRound.actionRequiredPlayers).containsOnly(player2)
+        assertThat(currentRound.performableActions).containsExactlyInAnyOrder(Action.BET)
         val pot = pokerService.retrievePotStatus()
         assertThat(pot.chips).isEqualTo(0)
+
     }
 
-    @Test
-    internal fun rule_bigBlind_bet_two_times_larger_then_smallBlind() {
-        val players = listOf(Player("A", role = Role.SMALL_BLIND), Player("B", Role.BIG_BLIND))
-        val initGameRequest = InitGameRequest(players)
-        pokerService.initGame(initGameRequest)
-
-        val round = pokerService.takeAction(Action("BET", 2))
-        val pot = pokerService.retrievePotStatus()
-
-        assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
-        assertThat(round.actionCompletedPlayer.role).isEqualTo(Role.BIG_BLIND)
-        assertThat(pot.chips).isEqualTo(4)
-    }
+//    @Test
+//    internal fun rule_bigBlind_bet_two_times_larger_then_smallBlind() {
+//        whenever(pokerRepository.retrieveCurrentRoundDetails())
+//
+//        val round = pokerService.takeAction(Action("BET", 2))
+//        assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
+//        assertThat(round.actionCompletedPlayer.role).isEqualTo(Role.BIG_BLIND)
+//
+//        val pot = pokerService.retrievePotStatus()
+//        assertThat(pot.chips).isEqualTo(4)
+//    }
 }

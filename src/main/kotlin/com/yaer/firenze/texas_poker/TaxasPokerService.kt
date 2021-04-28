@@ -6,6 +6,7 @@ import java.util.*
 
 @Service
 class TaxasPokerService(private val pokerRepository: PokerRepository) {
+    private lateinit var currentRound: Round
     private lateinit var pot: Pot
     private lateinit var leftCards: Stack<Cards>
 
@@ -27,6 +28,7 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
         }
         initGameCards()
         pot = Pot()
+        currentRound = Round(players)
         saveAllPlayers(players)
     }
 
@@ -51,5 +53,9 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
 
     fun retrievePlayerCards(playerName: String): List<Cards> {
         return pokerRepository.retrieveCardsByName(playerName)
+    }
+
+    fun retrieveCurrentRoundStatus(): Round {
+        return currentRound
     }
 }
