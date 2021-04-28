@@ -88,6 +88,8 @@ internal class TaxasPokerServiceTest {
         val player3 = Player("C", null)
         val player4 = Player("D", null)
         val players = listOf(player1, player2, player3, player4)
+        val initGameRequest = InitGameRequest(players)
+        pokerService.initGame(initGameRequest)
         val oldRoundStatus = Round(players)
         oldRoundStatus.roundName = RoundName.FLOP
         oldRoundStatus.actionTakingPlayer = player1
@@ -100,15 +102,14 @@ internal class TaxasPokerServiceTest {
         pot.chips = 7
         pokerService.pot = pot
 
-        pokerService.takeAction(ActionRequest(Action.CALL, 2))
+        val updatedRoundDetails = pokerService.takeAction(ActionRequest(Action.CALL, 2))
 
-        val updatedRoundDetails = pokerService.retrieveCurrentRoundStatus()
         assertThat(updatedRoundDetails.roundName).isEqualTo(RoundName.FLOP)
         assertThat(updatedRoundDetails.actionTakingPlayer).isEqualTo(player2)
-        assertThat(updatedRoundDetails.actionRequiredPlayers).isEqualTo(listOf(player3, player4))
+        assertThat(updatedRoundDetails.actionRequiredPlayers).isEqualTo(mutableListOf(player3, player4))
         assertThat(updatedRoundDetails.eligibleForFold).isFalse
         assertThat(updatedRoundDetails.actionCompletedPlayer).isEqualTo(player1)
-        assertThat(updatedRoundDetails.performableActions).isEqualTo(listOf(Action.CALL, Action.RAISE))
+        assertThat(updatedRoundDetails.performableActions).isEqualTo(mutableListOf(Action.CHECK, Action.RAISE, Action.FOLD, Action.CALL))
         assertThat(pokerService.retrievePotStatus().chips).isEqualTo(9)
     }
 

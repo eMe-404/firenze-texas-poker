@@ -26,9 +26,27 @@ class TaxasPokerService {
                 pot.chips += pot.chips * 2
             }
         }
+        return updateRoundDetails(actionRequest)
+    }
 
-        TODO("implement details")
-
+    private fun updateRoundDetails(actionRequest: ActionRequest): Round {
+        val oldRound = roundDetails
+        val updatedRound = Round(playerCardsMap.keys.toList())
+        val oldRoundActionRequiredPlayers = oldRound.actionRequiredPlayers
+        updatedRound.roundName = oldRound.roundName
+        updatedRound.actionTakingPlayer = oldRoundActionRequiredPlayers[0]
+        val subList = mutableListOf<Player>()
+        subList.addAll(oldRoundActionRequiredPlayers.subList(1, oldRoundActionRequiredPlayers.size))
+        subList.add(oldRound.actionCompletedPlayer!!)
+        updatedRound.actionRequiredPlayers = subList
+        updatedRound.actionCompletedPlayer = oldRound.actionTakingPlayer
+        if (oldRound.eligibleForFold) {
+            updatedRound.performableActions = listOf(Action.CHECK, Action.RAISE, Action.FOLD, Action.CALL)
+        } else {
+            updatedRound.performableActions = listOf(Action.RAISE, Action.FOLD, Action.CALL)
+        }
+        this.roundDetails = updatedRound
+        this.pot.chips += actionRequest.chips ?: 0
         return roundDetails
     }
 
