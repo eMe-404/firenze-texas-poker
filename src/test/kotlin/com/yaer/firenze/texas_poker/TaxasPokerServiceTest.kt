@@ -81,6 +81,37 @@ internal class TaxasPokerServiceTest {
         assertThrows<IllegalArgumentException> { pokerService.takeAction(ActionRequest(Action.FOLD, null)) }
     }
 
+    @Test
+    internal fun rule_depend_on_situation_players_can_take_relative_actions_when_action_is_call() {
+        val player1 = Player("A", null)
+        val player2 = Player("B", null)
+        val player3 = Player("C", null)
+        val player4 = Player("D", null)
+        val players = listOf(player1, player2, player3, player4)
+        val oldRoundStatus = Round(players)
+        oldRoundStatus.roundName = RoundName.FLOP
+        oldRoundStatus.actionTakingPlayer = player1
+        oldRoundStatus.actionRequiredPlayers = listOf(player2, player3)
+        oldRoundStatus.actionCompletedPlayer = player4
+        oldRoundStatus.eligibleForFold = true
+        oldRoundStatus.performableActions = listOf(Action.CALL, Action.FOLD, Action.RAISE, Action.CHECK)
+        pokerService.roundDetails = oldRoundStatus
+        val pot = Pot()
+        pot.chips = 7
+        pokerService.pot = pot
+
+        pokerService.takeAction(ActionRequest(Action.CALL, 2))
+
+        val updatedRoundDetails = pokerService.retrieveCurrentRoundStatus()
+        assertThat(updatedRoundDetails.roundName).isEqualTo(RoundName.FLOP)
+        assertThat(updatedRoundDetails.actionTakingPlayer).isEqualTo(player2)
+        assertThat(updatedRoundDetails.actionRequiredPlayers).isEqualTo(listOf(player3, player4))
+        assertThat(updatedRoundDetails.eligibleForFold).isFalse
+        assertThat(updatedRoundDetails.actionCompletedPlayer).isEqualTo(player1)
+        assertThat(updatedRoundDetails.performableActions).isEqualTo(listOf(Action.CALL, Action.RAISE))
+        assertThat(pokerService.retrievePotStatus().chips).isEqualTo(9)
+    }
+
     private fun stubActionForBigBlind() {
         val player1 = Player("One", Role.SMALL_BLIND)
         val player2 = Player("Two", Role.BIG_BLIND)

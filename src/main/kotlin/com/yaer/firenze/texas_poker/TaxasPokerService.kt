@@ -27,6 +27,8 @@ class TaxasPokerService {
             }
         }
 
+        TODO("implement details")
+
         return roundDetails
     }
 
