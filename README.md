@@ -6,9 +6,12 @@ Q: rule 跟example具体在放在什么级别的测试
 
 Q: 只要在Business Rule出现的item都需要写具体的测试来验证码？
 
+Q: Business Rule 具体的实现以及测试要follow 一个具体的order吗（比如列的business rule的order）
+
 Q: 如何确定Example涉及到的state所归属的对象
 
 Q: 目前SBE 写出来的example粒度有点大，比如要完成的满足第一个规则就需要写很多代码层的准备和design，如何做到incremental design
+
 
 BizQ: 一轮中同时又多名玩家all in？如何设计此结算点
 

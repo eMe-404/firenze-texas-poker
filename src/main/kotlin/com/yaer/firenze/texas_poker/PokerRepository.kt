@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class PokerRepository {
+    private lateinit var currentRound: Round
     private lateinit var playerCardsMap: HashMap<String, List<Cards>>
 
     fun retrieveCardsByName(playerName: String): List<Cards> {
@@ -12,6 +13,14 @@ class PokerRepository {
 
     fun save(player: Player, defaultCards: List<Cards>) {
         playerCardsMap[player.name] = defaultCards
+    }
+
+    fun initRound(players: List<Player>) {
+        currentRound = Round(players)
+    }
+
+    fun retrieveCurrentRound(): Round {
+        return currentRound
     }
 
 }

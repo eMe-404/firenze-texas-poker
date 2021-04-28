@@ -1,17 +1,17 @@
 package com.yaer.firenze.texas_poker
 
+import com.yaer.firenze.texas_poker.request.ActionRequest
 import com.yaer.firenze.texas_poker.request.InitGameRequest
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class TaxasPokerService(private val pokerRepository: PokerRepository) {
-    private lateinit var currentRound: Round
     private lateinit var pot: Pot
     private lateinit var leftCards: Stack<Cards>
 
 
-    fun takeAction(action: Action): Round {
+    fun takeAction(action: ActionRequest): Round {
         TODO("Not yet implemented")
     }
 
@@ -28,7 +28,7 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
         }
         initGameCards()
         pot = Pot()
-        currentRound = Round(players)
+        pokerRepository.initRound(players)
         saveAllPlayers(players)
     }
 
@@ -56,6 +56,6 @@ class TaxasPokerService(private val pokerRepository: PokerRepository) {
     }
 
     fun retrieveCurrentRoundStatus(): Round {
-        return currentRound
+        return pokerRepository.retrieveCurrentRound()
     }
 }
