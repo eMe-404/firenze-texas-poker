@@ -64,6 +64,24 @@ internal class TaxasPokerServiceTest {
 
     @Test
     internal fun rule_bigBlind_bet_two_times_larger_then_smallBlind() {
+        stubActionForBigBlind()
+
+        val actionRequest = ActionRequest(Action.BET, null)
+        val round = pokerService.takeAction(actionRequest)
+
+        assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
+        val pot = pokerService.retrievePotStatus()
+        assertThat(pot.chips).isEqualTo(6)
+    }
+
+    @Test
+    internal fun rule_in_pre_fold_players_can_not_fold() {
+        stubActionForBigBlind()
+
+        assertThrows<IllegalArgumentException> { pokerService.takeAction(ActionRequest(Action.FOLD, null)) }
+    }
+
+    private fun stubActionForBigBlind() {
         val player1 = Player("One", Role.SMALL_BLIND)
         val player2 = Player("Two", Role.BIG_BLIND)
         val player3 = Player("Three", null)
@@ -77,12 +95,7 @@ internal class TaxasPokerServiceTest {
         currentRound.actionRequiredPlayers = listOf(player3)
         pokerService.roundDetails = currentRound
         pokerService.pot.chips = 2
-
-        val actionRequest = ActionRequest(Action.BET, null)
-        val round = pokerService.takeAction(actionRequest)
-
-        assertThat(round.roundName).isEqualTo(RoundName.PRE_FLOP)
-        val pot = pokerService.retrievePotStatus()
-        assertThat(pot.chips).isEqualTo(6)
     }
+
+
 }

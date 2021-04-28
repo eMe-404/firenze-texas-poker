@@ -16,8 +16,15 @@ class TaxasPokerService {
 
 
     fun takeAction(actionRequest: ActionRequest): Round {
-        if (roundDetails.actionTakingPlayer.role == Role.BIG_BLIND && roundDetails.roundName == RoundName.PRE_FLOP) {
-            pot.chips += pot.chips * 2
+        if (roundDetails.roundName == RoundName.PRE_FLOP) {
+            if (actionRequest.action == Action.FOLD) {
+                throw IllegalArgumentException("in ${RoundName.PRE_FLOP} can not able to take ${Action.FOLD}")
+            }
+
+
+            if (roundDetails.actionTakingPlayer.role == Role.BIG_BLIND) {
+                pot.chips += pot.chips * 2
+            }
         }
 
         return roundDetails
